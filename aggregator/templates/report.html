@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SecureFlow report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#ffffff; --ink:#151d27; --muted:#59667a; --line:#dce1e8;
+  --critical:#a3123f; --high:#d4501a; --medium:#c79212; --low:#2f7f9e; --info:#8592a3;
+  --good:#1b7a5a; --bad:#b4234a; --focus:#2457d6;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#10151b; --panel:#18202a; --ink:#e7ecf2; --muted:#9aa8b8; --line:#2a3542;
+    --critical:#ff5c85; --high:#ff8a4d; --medium:#e8b84a; --low:#5cb6d6; --info:#8c9bad;
+    --good:#4cc9a0; --bad:#ff6b8b; --focus:#8ab0ff;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:36px 20px 64px}
+.mono,code{font-family:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;font-size:.85em}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+.meta{color:var(--muted);font-size:.9rem;margin:0 0 20px}
+.verdict{font-size:clamp(1.5rem,3.4vw,2.2rem);line-height:1.25;font-weight:600;margin:0 0 6px;max-width:30ch}
+.verdict.pass{color:var(--good)} .verdict.fail{color:var(--bad)}
+.reasons{margin:0 0 24px;padding-left:1.1rem;color:var(--muted)}
+.score{color:var(--muted);margin:0 0 20px}
+
+.strip{display:flex;height:22px;border-radius:4px;overflow:hidden;background:var(--line);margin:8px 0 10px}
+.strip span{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 36px;padding:0;list-style:none}
+.legend li{display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+.legend b{font-weight:600}
+
+h2{font-size:1.15rem;margin:0 0 12px}
+section{margin-bottom:40px}
+.cols{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,3fr);gap:40px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.bars{display:grid;grid-template-columns:minmax(15rem,1.6fr) minmax(4rem,1fr) 2.2rem;gap:8px 12px;align-items:center;font-size:.92rem}
+.bars .track{height:10px;background:var(--line);border-radius:3px;overflow:hidden}
+.bars .fill{height:100%;background:var(--low)}
+.bars .n{text-align:right;font-variant-numeric:tabular-nums}
+.tools{list-style:none;margin:0;padding:0}
+.tools li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.missing{color:var(--bad)}
+
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+select,input{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+input{min-width:220px;flex:1}
+.finding{background:var(--panel);border:1px solid var(--line);border-left-width:5px;border-radius:6px;margin-bottom:8px}
+.finding summary{cursor:pointer;list-style:none;padding:11px 14px;display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:4px 14px;align-items:baseline}
+.finding summary::-webkit-details-marker{display:none}
+.sev{font-weight:600;font-size:.9rem}
+.title{font-weight:500}
+.where{grid-column:2;color:var(--muted);overflow-wrap:anywhere}
+.body{padding:2px 14px 14px 14px;border-top:1px solid var(--line);color:var(--ink)}
+.body p{margin:10px 0 0;max-width:80ch}
+.body .k{color:var(--muted)}
+.finding.suppressed{opacity:.6}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:6px}
+</style>
+</head>
+<body>
+<main>
+  <p class="meta" id="meta"></p>
+  <h1 class="verdict" id="verdict"></h1>
+  <ul class="reasons" id="reasons"></ul>
+  <p class="score" id="score"></p>
+  <div class="strip" id="strip" role="img" aria-label="Findings by severity"></div>
+  <ul class="legend" id="legend"></ul>
+
+  <div class="cols">
+    <section>
+      <h2>OWASP Top 10 (2021)</h2>
+      <div class="bars" id="owasp"></div>
+    </section>
+    <section>
+      <h2>Scanners</h2>
+      <ul class="tools" id="tools"></ul>
+    </section>
+  </div>
+
+  <section>
+    <h2>Findings</h2>
+    <div class="filters">
+      <select id="fSev" aria-label="Filter by severity"><option value="">All severities</option></select>
+      <select id="fTool" aria-label="Filter by tool"><option value="">All tools</option></select>
+      <select id="fOwasp" aria-label="Filter by OWASP category"><option value="">All categories</option></select>
+      <input id="fText" type="search" placeholder="Search title, file or CWE" aria-label="Search findings">
+    </div>
+    <div id="list"></div>
+  </section>
+</main>
+
+<script id="data" type="application/json">__REPORT_JSON__</script>
+<script>
+(function () {
+  var R = JSON.parse(document.getElementById('data').textContent);
+  var SEV = ['critical', 'high', 'medium', 'low', 'info'];
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var color = function (s) { return 'var(--' + s + ')'; };
+  var S = R.summary, G = R.gate, M = R.meta;
+
+  document.title = 'SecureFlow report: ' + M.target;
+  $('meta').textContent = 'Target: ' + M.target + '  |  ' + M.generated_at +
+    (M.commit ? '  |  commit ' + M.commit.slice(0, 7) : '');
+
+  var v = $('verdict');
+  var worst = S.by_severity.critical + S.by_severity.high;
+  v.className = 'verdict ' + (G.passed ? 'pass' : 'fail');
+  v.textContent = G.passed
+    ? 'The security gate passed with ' + S.total + ' remaining finding' + (S.total === 1 ? '' : 's') + '.'
+    : 'The security gate failed: ' + worst + ' critical or high finding' + (worst === 1 ? '' : 's') + '.';
+  $('reasons').innerHTML = G.reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
+  $('score').textContent = 'Risk score ' + S.risk_score + ' of 100, grade ' + S.grade +
+    '. ' + S.suppressed + ' finding' + (S.suppressed === 1 ? '' : 's') + ' suppressed with a written reason.';
+
+  var total = Math.max(S.total, 1);
+  $('strip').innerHTML = SEV.map(function (s) {
+    var n = S.by_severity[s] || 0;
+    return n ? '<span style="width:' + (n / total * 100) + '%;background:' + color(s) + '" title="' + s + ': ' + n + '"></span>' : '';
+  }).join('');
+  $('legend').innerHTML = SEV.map(function (s) {
+    return '<li><span class="dot" style="background:' + color(s) + '"></span><b>' + (S.by_severity[s] || 0) + '</b> ' + s + '</li>';
+  }).join('');
+
+  var codes = Object.keys(R.owasp_names);
+  var maxO = Math.max.apply(null, codes.map(function (c) { return S.by_owasp[c] || 0; }).concat([1]));
+  $('owasp').innerHTML = codes.map(function (c) {
+    var n = S.by_owasp[c] || 0;
+    return '<div>' + c + ' ' + esc(R.owasp_names[c]) + '</div><div class="track"><div class="fill" style="width:' +
+      (n / maxO * 100) + '%"></div></div><div class="n">' + n + '</div>';
+  }).join('') + ((S.by_owasp.NA || 0) ? '<div>Not mapped</div><div class="track"><div class="fill" style="width:' +
+      (S.by_owasp.NA / maxO * 100) + '%"></div></div><div class="n">' + S.by_owasp.NA + '</div>' : '');
+
+  var run = M.tools_run.map(function (t) { return '<li><span>' + esc(t) + '</span><span>ran</span></li>'; });
+  var miss = M.tools_missing.map(function (t) { return '<li class="missing"><span>' + esc(t) + '</span><span>no output</span></li>'; });
+  $('tools').innerHTML = run.concat(miss).join('');
+
+  function fill(sel, values, fmt) {
+    values.forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = fmt ? fmt(x) : x; $(sel).appendChild(o); });
+  }
+  var uniq = function (k) { return Array.from(new Set(R.findings.map(function (f) { return f[k]; }))).filter(Boolean); };
+  fill('fSev', SEV.filter(function (s) { return uniq('severity').indexOf(s) > -1; }));
+  fill('fTool', uniq('tool').sort());
+  fill('fOwasp', uniq('owasp').sort(), function (c) { return R.owasp_names[c] ? c + ' ' + R.owasp_names[c] : 'Not mapped'; });
+
+  function render() {
+    var sev = $('fSev').value, tool = $('fTool').value, ow = $('fOwasp').value, q = $('fText').value.toLowerCase();
+    var rows = R.findings.filter(function (f) {
+      return (!sev || f.severity === sev) && (!tool || f.tool === tool) && (!ow || f.owasp === ow) &&
+        (!q || (f.title + ' ' + f.location + ' ' + f.cwe + ' ' + f.rule_id).toLowerCase().indexOf(q) > -1);
+    });
+    if (!rows.length) { $('list').innerHTML = '<div class="empty">No findings match these filters.</div>'; return; }
+    $('list').innerHTML = rows.map(function (f) {
+      var where = esc(f.location) + (f.line ? ':' + f.line : '');
+      var more = f.count > 1 ? ' (' + f.count + ' instances)' : '';
+      return '<details class="finding' + (f.suppressed ? ' suppressed' : '') + '" style="border-left-color:' + color(f.severity) + '">' +
+        '<summary><span class="sev" style="color:' + color(f.severity) + '">' + f.severity + '</span>' +
+        '<span class="title">' + esc(f.title) + more + '</span><span class="where mono">' + where + '</span></summary>' +
+        '<div class="body">' +
+        (f.description ? '<p>' + esc(f.description) + '</p>' : '') +
+        (f.remediation ? '<p><span class="k">Fix: </span>' + esc(f.remediation) + '</p>' : '') +
+        '<p class="k">Found by ' + esc(f.tool) + ' (' + esc(f.rule_id) + ')' + (f.cwe ? ', ' + esc(f.cwe) : '') +
+        (f.owasp && R.owasp_names[f.owasp] ? ', ' + f.owasp + ' ' + esc(R.owasp_names[f.owasp]) : '') + '</p>' +
+        (f.suppressed ? '<p class="k">Suppressed: ' + esc(f.suppression_reason) + '</p>' : '') +
+        '</div></details>';
+    }).join('');
+  }
+  ['fSev', 'fTool', 'fOwasp'].forEach(function (id) { $(id).addEventListener('change', render); });
+  $('fText').addEventListener('input', render);
+  render();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Search</title></head>
+<body>
+  <h2>Results for {{ q }}</h2>
+  <ul>
+    {% for row in rows %}<li>{{ row[1] }}</li>{% endfor %}
+  </ul>
+</body>
+</html>

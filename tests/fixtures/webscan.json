@@ -1,0 +1,5 @@
+{"scanner": "secureflow-scanner", "target": "http://localhost:5000", "findings": [
+  {"tool": "secureflow-scanner", "rule_id": "SF-CORS-002", "title": "CORS reflects arbitrary Origin with credentials",
+   "severity": "high", "category": "dast", "location": "http://localhost:5000", "description": "Echoes Origin.",
+   "remediation": "Use an allow-list.", "cwe": "CWE-942", "owasp": "A05"}
+]}

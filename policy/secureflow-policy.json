@@ -1,0 +1,7 @@
+{
+  "max_critical": 0,
+  "max_high": 0,
+  "max_medium": null,
+  "max_low": null,
+  "required_tools": ["gitleaks", "semgrep", "trivy-fs", "trivy-image", "zap", "webscan"]
+}

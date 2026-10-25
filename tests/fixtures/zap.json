@@ -1,0 +1,13 @@
+{"site": [{"@name": "http://localhost:5000", "alerts": [
+  {"pluginid": "10038", "alertRef": "10038-1", "alert": "Content Security Policy (CSP) Header Not Set",
+   "name": "Content Security Policy (CSP) Header Not Set", "riskcode": "2", "confidence": "3", "cweid": "693",
+   "desc": "<p>CSP is an added layer of security.</p>", "solution": "<p>Set the CSP header.</p>", "count": "3",
+   "instances": [{"uri": "http://localhost:5000/", "method": "GET"}, {"uri": "http://localhost:5000/search", "method": "GET"},
+                 {"uri": "http://localhost:5000/robots.txt", "method": "GET"}]},
+  {"pluginid": "10054", "alertRef": "10054-1", "alert": "Cookie without SameSite Attribute",
+   "name": "Cookie without SameSite Attribute", "riskcode": "1", "confidence": "2", "cweid": "1275",
+   "desc": "<p>A cookie has been set without the SameSite attribute.</p>", "solution": "<p>Set SameSite.</p>", "count": "1",
+   "instances": [{"uri": "http://localhost:5000/", "method": "GET"}]},
+  {"pluginid": "10049", "alertRef": "10049", "alert": "Storable Content", "name": "Storable Content", "riskcode": "0",
+   "cweid": "-1", "desc": "<p>Info.</p>", "solution": "<p>-</p>", "count": "1", "instances": []}
+]}]}

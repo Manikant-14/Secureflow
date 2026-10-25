@@ -1,0 +1,2 @@
+[{"RuleID": "generic-api-key", "Description": "Generic API Key", "File": "app/vulnerable/app.py",
+  "StartLine": 17, "Secret": "x9Fq2LmZ7pRt4VbN8cYd1HsK6wJe3GaU", "Match": "API_KEY = \"x9Fq2LmZ7pRt4VbN8cYd1HsK6wJe3GaU\""}]

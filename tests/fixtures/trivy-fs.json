@@ -1,0 +1,14 @@
+{"Results": [
+  {"Target": "requirements.txt", "Class": "lang-pkgs", "Type": "pip", "Vulnerabilities": [
+    {"VulnerabilityID": "CVE-2020-14343", "PkgName": "PyYAML", "InstalledVersion": "5.3.1", "FixedVersion": "5.4",
+     "Severity": "CRITICAL", "Title": "PyYAML: incomplete fix for CVE-2020-1747", "CweIDs": ["CWE-20"]},
+    {"VulnerabilityID": "CVE-2023-25577", "PkgName": "Werkzeug", "InstalledVersion": "2.0.3", "FixedVersion": "2.2.3",
+     "Severity": "HIGH", "Title": "Werkzeug: high resource usage when parsing multipart form data", "CweIDs": ["CWE-400"]}]},
+  {"Target": "Dockerfile", "Class": "config", "Type": "dockerfile", "Misconfigurations": [
+    {"ID": "DS002", "AVDID": "AVD-DS-0002", "Title": "Image user should not be 'root'", "Severity": "HIGH",
+     "Message": "Specify at least 1 USER command in Dockerfile with non-root user as argument",
+     "Resolution": "Add 'USER <non root user name>' line to the Dockerfile", "Status": "FAIL",
+     "CauseMetadata": {"StartLine": 0}},
+    {"ID": "DS026", "AVDID": "AVD-DS-0026", "Title": "No HEALTHCHECK defined", "Severity": "LOW",
+     "Message": "Add HEALTHCHECK instruction in your Dockerfile", "Resolution": "Add HEALTHCHECK", "Status": "FAIL"}]}
+]}
