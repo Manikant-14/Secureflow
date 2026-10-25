@@ -5,8 +5,7 @@
 [![SecureFlow](https://github.com/Manikant-14/Secureflow/actions/workflows/secureflow.yml/badge.svg)](https://github.com/Manikant-14/Secureflow/actions/workflows/secureflow.yml)
 
 **🔗 Live dashboard:** https://manikant-14.github.io/Secureflow/  
-**🎥 Demo video:** _add link_  
-**📄 Full report:** [docs/PROJECT_REPORT.md](docs/PROJECT_REPORT.md)
+
 
 ![SecureFlow dashboard](docs/images/dashboard-vulnerable.png)
 
