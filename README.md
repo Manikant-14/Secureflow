@@ -130,7 +130,7 @@ Settings → Pages → Source: GitHub Actions
 
 **4. Open the dashboard**
 ```
-https://manikant-14.github.io/secureflow/
+https://manikant-14.github.io/Secureflow/
 ```
 
 The overall workflow run stays green on purpose, so the report always publishes.
@@ -159,8 +159,8 @@ python -m scanner.webscan --url http://localhost:5000 --output webscan.json
 
 Or run the vulnerable app in a container, bound to localhost only:
 ```bash
-docker build -t secureflow-vulnerable app/vulnerable
-docker run --rm -p 127.0.0.1:5000:5000 secureflow-vulnerable
+docker build -t Secureflow-vulnerable app/vulnerable
+docker run --rm -p 127.0.0.1:5000:5000 Secureflow-vulnerable
 ```
 
 ---
